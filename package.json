@@ -8,5 +8,17 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/autoload": "^5.7.1",
+    "@fastify/cors": "^8.3.0",
+    "@fastify/env": "^4.2.0",
+    "@fastify/jwt": "^7.2.0",
+    "@fastify/sensible": "^5.2.0",
+    "@fastify/swagger": "^8.9.0",
+    "@fastify/type-provider-typebox": "^3.5.0",
+    "fastify": "^4.22.1",
+    "fastify-cli": "^5.8.0",
+    "fastify-plugin": "^4.5.1"
+  }
 }
