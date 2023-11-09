@@ -30,7 +30,8 @@
     "fastify": "^4.22.1",
     "fastify-cli": "^5.8.0",
     "fastify-plugin": "^4.5.1",
-    "knex": "^3.0.1"
+    "knex": "^3.0.1",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/node": "^20.5.7",
