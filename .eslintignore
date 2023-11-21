@@ -2,3 +2,5 @@ knexfile.ts
 .eslintrc.js
 
 migrations
+
+seeds

@@ -6,5 +6,5 @@
     "sourceMap": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": [".eslintrc.js"]
+  "exclude": [".eslintrc.js", "seeds/**/*.ts"]
 }
