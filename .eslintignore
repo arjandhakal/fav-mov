@@ -1,6 +1,6 @@
 knexfile.ts
 .eslintrc.js
-
+*.d.ts
 migrations
 
 seeds

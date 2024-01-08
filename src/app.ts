@@ -1,70 +1,56 @@
 import { type FastifyInstance, type FastifyPluginOptions } from 'fastify'
+import AutoLoad from '@fastify/autoload'
 import Sensible from '@fastify/sensible'
-
-interface FavMovies {
-  title: string
-  description: string
-  genre: string
-}
-
-const favMovies: FavMovies[] = []
+import Env from '@fastify/env'
+import Cors from '@fastify/cors'
+import { join } from 'path'
+import { EnvSchema } from './schemas/dotenv'
 
 export default async function (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions,
 ): Promise<void> {
+  await fastify.register(Env, {
+    schema: EnvSchema,
+    dotenv: true,
+    data: opts.configData,
+  })
+
   await fastify.register(Sensible)
 
-  fastify.route({
-    url: '/movies',
-    method: 'GET',
-    handler: function myHandler(request, reply) {
-      reply.send({
-        message: 'Movies listed successfully',
-        success: true,
-        data: favMovies,
-      })
-    },
+  await fastify.register(Cors, {
+    origin: true,
   })
 
-  fastify.route({
-    url: '/movies',
-    method: 'POST',
-    handler: function handler(request, reply) {
-      const data = request.body as FavMovies
-      if (!data?.title || !data?.description || !data.genre) {
-        throw fastify.httpErrors.badRequest(
-          'Please ensure all information, title, description and genre are provided',
-        )
-      }
-      favMovies.push({
-        title: data.title,
-        description: data.description,
-        genre: data.genre,
-      })
-
-      reply.send({
-        message: 'Movie added succesfully',
-        success: true,
-        data: null,
-      })
-    },
+  await fastify.register(AutoLoad, {
+    dir: join(__dirname, '.', 'plugins'),
+    dirNameRoutePrefix: false,
+    ignorePattern: /.*.no-load\.js/,
+    indexPattern: /^no$/i,
+    options: Object.assign({}, opts),
   })
 
-  fastify.get('/movies/:movieGenre', function getMovie(request, reply) {
-    const requestParams = request.params as { movieGenre: string }
-    const searchingFor = requestParams.movieGenre
-    const result = favMovies.filter(movie => movie.genre === searchingFor)
-    if (result) {
-      return {
-        message: 'Movie info found succesfully',
-        success: true,
-        data: result,
-      }
-    } else {
-      throw fastify.httpErrors.notFound(
-        `Could not find movies with the genre: ${searchingFor}`,
-      )
+  await fastify.register(AutoLoad, {
+    dir: join(__dirname, 'routes'),
+    indexPattern: /.*routes(\.js|\.cjs)$/i,
+    ignorePattern: /.*\.js/,
+    autoHooksPattern: /.*hooks(\.js|\.cjs|\.ts)$/i,
+    autoHooks: true,
+    cascadeHooks: true,
+    options: Object.assign({}, opts),
+  })
+
+  if (fastify.config.NODE_ENV === 'development') {
+    console.log('CURRENT ROUTES:')
+    console.log(fastify.printRoutes())
+  }
+
+  // Add an onClose hook to close any open connections such as connections to DB
+  fastify.addHook('onClose', async fastify => {
+    console.log('Running onClose hook...')
+    if (fastify.knex) {
+      await fastify.knex.destroy()
     }
+    console.log('Running onClose hook complete')
   })
 }
