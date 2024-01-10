@@ -1,10 +1,14 @@
 {
   "extends": "fastify-tsconfig",
+  "ts-node": {
+    "files": true
+  },
   "compilerOptions": {
     "outDir": "dist",
     "declaration": false,
     "sourceMap": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": [".eslintrc.js", "seeds/**/*.ts"]
+  "exclude": [".eslintrc.js", "seeds/**/*.ts"],
+  "typeRoots": ["./src/types"]
 }
